@@ -1170,11 +1170,17 @@ class CLITuiMixin:
             event.app.invalidate()
 
     def _tui_handle_ctrl_v(self, event):
-        """Image paste for terminals without bracketed paste: GNOME Terminal/Konsole send raw
-        0x16. Terminals that intercept Ctrl+V (macOS Terminal, iTerm2, VSCode, Windows Terminal)
-        fire the bracketed-paste handler instead and never reach this."""
-        if self._try_attach_clipboard_image():
+        """Ctrl+V handler: auto-attach clipboard image if present; otherwise read clipboard text and insert."""
+        if not self._try_attach_clipboard_image():
+            from hermes_cli.clipboard import read_clipboard_text
+            text = read_clipboard_text()
+            if text:
+                event.current_buffer.insert_text(text)
+            else:
+                event.app.invalidate()
+        else:
             event.app.invalidate()
+
 
     def _tui_handle_ctrl_l(self, event):
         """Ctrl+L forces a clean repaint after terminal buffer drift (tmux/cmux tab switches,
