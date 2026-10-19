@@ -117,6 +117,37 @@ def write_clipboard_text(text: str) -> bool:
     return False
 
 
+def read_clipboard_text() -> str:
+    """Read text from system clipboard using OS native tools (xsel -> xclip -> wl-paste -> pbpaste -> powershell)."""
+    if sys.platform == "darwin":
+        try:
+            r = subprocess.run(["pbpaste"], timeout=3, **_TEXT)
+            return r.stdout if r.returncode == 0 else ""
+        except Exception:
+            return ""
+    if sys.platform == "win32":
+        try:
+            r = subprocess.run(["powershell", *_PS_FLAGS, "-Command", "Get-Clipboard"], timeout=3, **_TEXT)
+            return r.stdout if r.returncode == 0 else ""
+        except Exception:
+            return ""
+    linux = sys.platform not in ("darwin", "win32")
+    if linux:
+        for argv in [
+            ["xsel", "--clipboard", "--output"],
+            ["xclip", "-selection", "clipboard", "-o"],
+            ["wl-paste", "--type", "text/plain"],
+        ]:
+            try:
+                r = subprocess.run(argv, timeout=2, **_TEXT)
+                if r.returncode == 0 and r.stdout:
+                    return r.stdout
+            except Exception:
+                continue
+    return ""
+
+
+
 # ── macOS ────────────────────────────────────────────────────────────────
 
 def _osascript(expr: str, timeout: int = 3) -> str:
