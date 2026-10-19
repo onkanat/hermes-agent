@@ -140,6 +140,14 @@ def resolve_exec_command(project_root: Optional[Path] = None) -> str:
         prefix = [interpreter] if _needs_interpreter(resolved) else []
         # See #90292.
         argv = [*prefix, str(resolved), *_desktop_argv_tail(project_root)]
+    if not bin_path and project_root is not None:
+        # --- yerel yama: calisan launcher yedegi ---
+        # Masaustu Exec'i COLD ortamda kosar: modul bicimi icin secilen yorumlayici hermes_cli'yi
+        # import edemiyorsa giris OLU dogar (bu kurulumda tools python'u boyle). Checkout icindeki
+        # kurulum sarmalayicisi mevcutsa onu kalici Exec yap.
+        _sb = project_root / ".hermes" / "bin" / "hermes"
+        if _sb.is_file() and os.access(str(_sb), os.X_OK):
+            argv = [str(_sb.resolve()), *_desktop_argv_tail(project_root)]
     return " ".join(_quote_exec_arg(a) for a in argv)
 
 
