@@ -31,7 +31,7 @@ _VALID_PLUGIN_KINDS: set[str] = {"standalone", "backend", "exclusive", "platform
 # ── Manifest v2 (#64165) parsing helpers ──────────────────────────────────
 _KNOWN_MANIFEST_FIELDS: set[str] = {
     "name", "version", "description", "author", "requires_env", "provides_tools", "provides_hooks",
-    "kind", "hooks", "label", "optional_env", "platforms", "external_dependencies",
+    "provides_middleware", "kind", "hooks", "label", "optional_env", "platforms", "external_dependencies",
     "pip_dependencies", "provides_browser_providers", "provides_web_providers",
     "manifest_version", "api_version", "requires_plugins", "python_dependencies", "config_schema",
     "license", "homepage", "tags", "capabilities", "emits", "listens", "hermes", "depends",
