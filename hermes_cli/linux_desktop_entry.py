@@ -140,6 +140,12 @@ def resolve_exec_command(project_root: Optional[Path] = None) -> str:
         prefix = [interpreter] if _needs_interpreter(resolved) else []
         # See #90292.
         argv = [*prefix, str(resolved), *_desktop_argv_tail(project_root)]
+
+    if not bin_path and project_root is not None:
+        # --- yerel yama (desktop-exec-yamasi.py): calisan launcher yedegi ---
+        _sb = project_root / ".hermes" / "bin" / "hermes"
+        if _sb.is_file() and os.access(str(_sb), os.X_OK):
+            argv = [str(_sb.resolve()), *_desktop_argv_tail(project_root)]
     return " ".join(_quote_exec_arg(a) for a in argv)
 
 
